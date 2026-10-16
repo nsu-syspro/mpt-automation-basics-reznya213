@@ -8,3 +8,15 @@ build/$(NAME): src/wordcount.c config.json
 	gcc -DNAME='"$(NAME)"' -DVERSION='"$(VERSION)"' src/wordcount.c -o build/$(NAME)
 clean:
 	rm -rf build
+
+TESTS := $(wildcard test/*.txt)
+
+.PHONY: all clean check
+
+check: build/$(NAME)
+	@set -e; \
+	for testfile in $(TESTS); do \
+		expected="$${testfile%.txt}.expected"; \
+		./build/$(NAME) "$$testfile" 2>&1 | diff -u "$$expected" -; \
+	done
+
